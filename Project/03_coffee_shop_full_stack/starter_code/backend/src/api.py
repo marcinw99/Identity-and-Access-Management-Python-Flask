@@ -1,33 +1,32 @@
-import os
-from flask import Flask, request, jsonify, abort
-from sqlalchemy import exc
-import json
+from flask import Flask, jsonify
 from flask_cors import CORS
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
+from .database.models import setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
 app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
-'''
-@TODO uncomment the following line to initialize the datbase
-!! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
-!! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
-!! Running this funciton will add one
-'''
+
 # db_drop_and_create_all()
 
+
+def short_format_drinks(drinks):
+    return [drink.short() for drink in drinks]
+
+
 # ROUTES
-'''
-@TODO implement endpoint
-    GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
+
+
+@app.route('/drinks', methods=['GET'])
+def get_drinks():
+    drinks = Drink.query.all()
+
+    return jsonify({
+        'success': True,
+        'drinks': short_format_drinks(drinks)
+    })
 
 
 '''
@@ -39,7 +38,6 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
-
 '''
 @TODO implement endpoint
     POST /drinks
@@ -49,7 +47,6 @@ CORS(app)
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
-
 
 '''
 @TODO implement endpoint
@@ -63,7 +60,6 @@ CORS(app)
         or appropriate status code indicating reason for failure
 '''
 
-
 '''
 @TODO implement endpoint
     DELETE /drinks/<id>
@@ -74,7 +70,6 @@ CORS(app)
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
-
 
 # Error Handling
 '''
@@ -106,7 +101,6 @@ def unprocessable(error):
 @TODO implement error handler for 404
     error handler should conform to general task above
 '''
-
 
 '''
 @TODO implement error handler for AuthError
