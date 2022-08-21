@@ -159,7 +159,6 @@ def unprocessable(error):
 
 @app.errorhandler(AuthError)
 def auth_error(e):
-    print(e.error)
     return jsonify({
         "success": False,
         "error": e.status_code,
