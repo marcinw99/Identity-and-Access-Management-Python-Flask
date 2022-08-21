@@ -3,15 +3,14 @@ import json
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
 
-from .auth.auth import requires_auth
-from .database.models import setup_db, Drink
+from .auth.auth import requires_auth, AuthError
+from .database.models import setup_db, Drink, db_drop_and_create_all
 
 app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
-
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 
 def short_format_drinks(drinks):
@@ -75,7 +74,7 @@ def update_drink(token, drink_id):
     req_title = body.get('title', None)
     req_recipe = body.get('recipe', None)
 
-    if None in [req_title, req_recipe]:
+    if req_title is None and req_recipe is None:
         abort(400)
 
     updated_drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
@@ -112,7 +111,6 @@ def delete_drink(token, drink_id):
 
 # Error Handling
 
-# 400, 401, 404,
 
 @app.errorhandler(400)
 def bad_request(error):
@@ -157,3 +155,13 @@ def unprocessable(error):
         "error": 422,
         "message": "unprocessable"
     }), 422
+
+
+@app.errorhandler(AuthError)
+def auth_error(e):
+    print(e.error)
+    return jsonify({
+        "success": False,
+        "error": e.status_code,
+        "message": e.error
+    }), e.status_code
