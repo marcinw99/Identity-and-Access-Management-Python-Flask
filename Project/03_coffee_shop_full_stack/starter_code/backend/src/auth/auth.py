@@ -5,7 +5,7 @@ from urllib.request import urlopen
 from flask import request
 from jose import jwt
 
-AUTH0_DOMAIN = 'huffer.auth0.com'
+AUTH0_DOMAIN = 'huffer.eu.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'drinks-service'
 
